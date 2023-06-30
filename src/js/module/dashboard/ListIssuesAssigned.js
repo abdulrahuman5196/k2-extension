@@ -61,37 +61,80 @@ class ListIssuesAssigned extends React.Component {
             );
         }
 
+        const paymentIssues = _.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Awaiting Payment'}));
+        const underReviewIssues = _.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Reviewing'}));
+        // const helpWantedIssues = _.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Help Wanted'}));
+        const hourlyIssues = _.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Hourly'}));
+        const monthlyIssues = _.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Monthly'}));
+        const dailyIssues = _.pick(_.omit(this.props.issues, _.keys(paymentIssues).concat(_.keys(underReviewIssues))), issue => _.findWhere(issue.labels, {name: 'Daily'}));
+        const weeklyIssues = _.pick(_.omit(this.props.issues, _.keys(paymentIssues).concat(_.keys(underReviewIssues))), issue => !paymentIssues[issue] && _.findWhere(issue.labels, {name: 'Weekly'}));
+
         return (
             <div className="mb-3">
                 <div className="d-flex flex-row">
+                    {_.size(hourlyIssues) > 0 && (
                     <div className="col-3 pr-4">
                         <PanelIssues
                             title="Hourly"
                             extraClass="hourly"
-                            data={_.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Hourly'}))}
+                            data={hourlyIssues}
                         />
                     </div>
+                    )}
+                    {_.size(dailyIssues) > 0 && (
                     <div className="col-3 pr-4">
                         <PanelIssues
                             title="Daily"
                             extraClass="daily"
-                            data={_.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Daily'}))}
+                            data={dailyIssues}
                         />
                     </div>
+                    )}
+                    {_.size(weeklyIssues) > 0 && (
                     <div className="col-3 pr-4">
                         <PanelIssues
                             title="Weekly"
                             extraClass="weekly"
-                            data={_.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Weekly'}))}
+                            data={weeklyIssues}
                         />
                     </div>
-                    <div className="col-3">
+                    )}
+                    {_.size(monthlyIssues) > 0 && (
+                    <div className="col-3 pr-4">
                         <PanelIssues
                             title="Monthly"
                             extraClass="monthly"
-                            data={_.pick(this.props.issues, issue => _.findWhere(issue.labels, {name: 'Monthly'}))}
+                            data={monthlyIssues}
                         />
                     </div>
+                    )}
+                    {_.size(paymentIssues) > 0 && (
+                    <div className="col-3 pr-4">
+                        <PanelIssues
+                            title="Payment Issues"
+                            extraClass="paymentIssues"
+                            data={_.sortBy(paymentIssues, issue => new Date(issue.title.substring(18, 28)))}
+                        />
+                    </div>
+                    )}
+                    {_.size(underReviewIssues) > 0 && (
+                    <div className="col-3 pr-4">
+                        <PanelIssues
+                            title="Under Review"
+                            extraClass="paymentIssues"
+                            data={underReviewIssues}
+                        />
+                    </div>
+                    )}
+                    {/* {_.size(helpWantedIssues) > 0 && (
+                    <div className="col-3 pr-4">
+                        <PanelIssues
+                            title="Help Wanted"
+                            extraClass="paymentIssues"
+                            data={helpWantedIssues}
+                        />
+                    </div>
+                    )} */}
                 </div>
                 <div className="pt-4">
                     <PanelIssues
